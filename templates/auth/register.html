@@ -3,7 +3,13 @@
 {% block content %}
 <div class="auth-wrap">
     <div class="auth-container">
-        <div class="auth-badge">&#9997;&#65039;</div>
+        {# Icône trait fin : crayon, aucun emoji #}
+        <div class="icon-box" style="margin: 0 auto 1.1rem;">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+            </svg>
+        </div>
         <h2>Inscription</h2>
         <p class="auth-sub">Créez votre compte administrateur</p>
         <form method="POST">

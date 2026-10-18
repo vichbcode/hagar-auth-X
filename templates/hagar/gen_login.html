@@ -83,6 +83,8 @@
             background: none;
             border: none;
             cursor: pointer;
+            display: flex;
+            align-items: center;
             font-size: 1.1rem;
             color: var(--muted);
             padding: 0.3rem;
@@ -125,7 +127,12 @@
 </head>
 <body>
     <div class="card">
-        <div class="badge">&#128274;</div>
+        <div class="badge">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="4" y="11" width="16" height="9" rx="2"></rect>
+                <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+            </svg>
+        </div>
         <h1>{{ project.name }}</h1>
         <p class="subtitle">Connectez-vous à votre compte</p>
         <form id="loginForm">
@@ -139,7 +146,7 @@
                 <label class="field-label">{{ password_field.label }}</label>
                 <div class="pw-wrap">
                     <input type="password" name="password" required autocomplete="current-password" data-pw>
-                    <button type="button" class="pw-toggle" data-pw-toggle aria-label="Afficher le mot de passe">&#128065;</button>
+                    <button type="button" class="pw-toggle" data-pw-toggle aria-label="Afficher le mot de passe"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>
                 </div>
             </div>
             {% endif %}

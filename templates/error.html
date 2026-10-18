@@ -1,9 +1,18 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="auth-container" style="text-align: center;">
-    <h2 style="font-size: 3.5rem; margin: 0; color: var(--primary);">{{ code }}</h2>
-    <p style="color: var(--text-muted); margin: 1rem 0 2rem; line-height: 1.6;">{{ message }}</p>
-    <a href="{{ url_for('index') }}" class="btn-primary btn-full" style="display: block; text-decoration: none; text-align: center;">Retour à l'accueil</a>
+<div class="auth-wrap">
+    <div class="auth-container" style="text-align: center;">
+        <div class="icon-box" style="margin: 0 auto 1.25rem;">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 8v5"></path>
+                <path d="M12 16.5v.5"></path>
+            </svg>
+        </div>
+        <h2 style="font-size: 3rem; color: var(--accent); margin: 0;">{{ code }}</h2>
+        <p style="color: var(--text-muted); margin: 1rem 0 2rem; line-height: 1.6;">{{ message }}</p>
+        <a href="{{ url_for('index') }}" class="btn-primary btn-full" style="display: block; text-decoration: none; text-align: center;">Retour à l'accueil</a>
+    </div>
 </div>
 {% endblock %}

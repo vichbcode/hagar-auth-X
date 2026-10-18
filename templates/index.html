@@ -1,26 +1,157 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="hero" style="text-align: center; padding: 4rem 0;">
-    <h1 style="font-size: 3rem; margin-bottom: 1rem;">L'authentification facile pour les développeurs.</h1>
-    <p style="font-size: 1.25rem; color: var(--text-muted); max-width: 700px; margin: 0 auto 2rem;">
-        Créez des "Hagars" pour vos projets en quelques secondes. Définissez vos champs, générez vos formulaires et gérez vos utilisateurs en toute sécurité.
-    </p>
-    <a href="{{ url_for('register') }}" class="btn-primary btn-full" style="padding: 1rem 2rem; display: inline-block; width: auto;">Commencer gratuitement</a>
-</div>
+<section class="hero">
+    <div class="container">
+        <p class="hero-kicker">Hagar-Auth · outil de dev</p>
+        <h1 class="hero-title">Authentification simple pour vos projets</h1>
+        <p class="hero-subtitle">
+            Créez un espace de gestion pour vos formulaires d'inscription et de connexion, définissez vos champs
+            et intégrez des pages générées en toute sécurité.
+        </p>
+        <div class="hero-actions">
+            <a href="{{ url_for('register') }}" class="btn btn-primary">Commencer gratuitement</a>
+            <a href="{{ url_for('login') }}" class="btn btn-ghost">Se connecter</a>
+        </div>
+        <div class="terminal" aria-label="Exemple d'utilisation">
+            <div class="terminal-bar">
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-title">installation</span>
+            </div>
+            <div class="terminal-body">
+                <pre><code>curl -L https://hagar-auth.vercel.app &gt; /dev/null || true</code></pre>
+                <button class="btn btn-ghost terminal-copy" type="button" data-copy>Copier</button>
+            </div>
+        </div>
+    </div>
+</section>
 
-<div class="features" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem;">
-    <div class="feature-card" style="background: white; padding: 2rem; border-radius: 1rem; border: 1px solid var(--border);">
-        <h3 style="margin-bottom: 1rem; color: var(--primary);">Rapide</h3>
-        <p>Générez des fichiers HTML prêts à l'emploi pour l'inscription et la connexion.</p>
+<section class="why" data-fade>
+    <div class="container">
+        <h2 class="section-title">Pourquoi Hagar-Auth</h2>
+        <div class="grid grid-3">
+            <article class="card">
+                <h3>Minimaliste</h3>
+                <p>Une interface sobre, sans fioritures, pensée pour rester lisible et efficace.</p>
+            </article>
+            <article class="card">
+                <h3>Sérieux</h3>
+                <p>Des règles de sécurité claires, des validations précises et une logique sans effets inutiles.</p>
+            </article>
+            <article class="card">
+                <h3>Prêt à intégrer</h3>
+                <p>Des fichiers HTML générés, un jeton API par projet et une API REST à utiliser sans surcharger votre code.</p>
+            </article>
+        </div>
     </div>
-    <div class="feature-card" style="background: white; padding: 2rem; border-radius: 1rem; border: 1px solid var(--border);">
-        <h3 style="margin-bottom: 1rem; color: var(--primary);">Flexible</h3>
-        <p>Choisissez les champs dont vous avez besoin : texte, nombres, dates, et plus encore.</p>
+</section>
+
+<section class="features" data-fade>
+    <div class="container">
+        <h2 class="section-title">Fonctionnalités</h2>
+        <div class="grid grid-6">
+            <article class="card small">
+                <h3>Gestion de projets</h3>
+                <p>Un Hagar par projet avec verrouillage par mot de passe optionnel.</p>
+            </article>
+            <article class="card small">
+                <h3>Champs configurables</h3>
+                <p>Définissez libellés, types requis ou non selon vos besoins.</p>
+            </article>
+            <article class="card small">
+                <h3>Fichiers générés</h3>
+                <p>Pages d'inscription et de connexion auto-construites à télécharger.</p>
+            </article>
+            <article class="card small">
+                <h3>Jeton API rotatif</h3>
+                <p>Régénérez la clé à tout moment pour révoquer l'ancien accès.</p>
+            </article>
+            <article class="card small">
+                <h3>Liste utilisateurs</h3>
+                <p>Consultez les identifiants inscrits avec leurs données configurées.</p>
+            </article>
+            <article class="card small">
+                <h3>Protection API</h3>
+                <p>Authentification par en-tête X-Hagar-Token et garde-fous contre l'abus.</p>
+            </article>
+        </div>
     </div>
-    <div class="feature-card" style="background: white; padding: 2rem; border-radius: 1rem; border: 1px solid var(--border);">
-        <h3 style="margin-bottom: 1rem; color: var(--primary);">Sécurisé</h3>
-        <p>Toutes les données et les mots de passe sont hashés et protégés par nos soins.</p>
+</section>
+
+<section class="how" data-fade>
+    <div class="container">
+        <h2 class="section-title">Comment ça marche</h2>
+        <ol class="steps">
+            <li class="step">
+                <div class="step-header">
+                    <span class="step-num">01</span>
+                    <h3>Créer un projet</h3>
+                </div>
+                <p>Configurez un nom et, au besoin, un mot de passe pour restreindre l'accès à votre Hagar.</p>
+                <pre class="code-block"><code># Depuis l'interface
+/compte &gt; nouveau hagar</code></pre>
+            </li>
+            <li class="step">
+                <div class="step-header">
+                    <span class="step-num">02</span>
+                    <h3>Définir les champs</h3>
+                </div>
+                <p>Ajoutez les champs nécessaires (texte, email, mot de passe, etc.), indiquez l'obligatoire.</p>
+                <pre class="code-block"><code>champs: [email: requis, password: requis]</code></pre>
+            </li>
+            <li class="step">
+                <div class="step-header">
+                    <span class="step-num">03</span>
+                    <h3>Intégrer</h3>
+                </div>
+                <p>Téléchargez inscription.html et connexion.html, ou appelez l'API avec le jeton de votre projet.</p>
+                <pre class="code-block"><code>fetch('/api/hagar/login', {
+  headers: { 'X-Hagar-Token': '&lt;token&gt;' },
+  body: formData
+})</code></pre>
+            </li>
+        </ol>
     </div>
-</div>
+</section>
+
+<section class="cta" data-fade>
+    <div class="container">
+        <div class="cta-card">
+            <h2>Prêt à centraliser votre authentification</h2>
+            <p>Créez votre compte et générez vos premiers formulaires en quelques minutes.</p>
+            <div class="cta-actions">
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Créer un compte</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    const copyBtn = document.querySelector('[data-copy]');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText('curl -L https://hagar-auth.vercel.app');
+                copyBtn.textContent = 'Copié';
+                setTimeout(() => (copyBtn.textContent = 'Copier'), 1200);
+            } catch (e) {
+                copyBtn.textContent = 'Erreur';
+                setTimeout(() => (copyBtn.textContent = 'Copier'), 1200);
+            }
+        });
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('[data-fade]').forEach((el) => observer.observe(el));
+</script>
 {% endblock %}

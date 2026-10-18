@@ -3,47 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hagar-Auth - Authentication Facile</title>
+    <title>Hagar-Auth</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar">
+    <header class="navbar">
         <div class="container">
             <a href="{{ url_for('index') }}" class="logo">Hagar-Auth</a>
-            <ul class="nav-links">
-                {% if current_user.is_authenticated %}
-                    <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-                    <li><a href="{{ url_for('profile') }}">Mon Profil</a></li>
-                    <li>
-                        <form action="{{ url_for('logout') }}" method="POST" style="display: inline;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn-logout">Déconnexion</button>
-                        </form>
-                    </li>
-                {% else %}
-                    <li><a href="{{ url_for('login') }}">Connexion</a></li>
-                    <li><a href="{{ url_for('register') }}" class="btn-signup">S'inscrire</a></li>
-                {% endif %}
-            </ul>
+            <button class="burger" aria-label="Menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <nav class="nav">
+                <ul class="nav-links">
+                    {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                        <li><a href="{{ url_for('profile') }}">Mon profil</a></li>
+                        <li>
+                            <form action="{{ url_for('logout') }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn-logout">Déconnexion</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li><a href="{{ url_for('login') }}">Connexion</a></li>
+                        <li><a href="{{ url_for('register') }}" class="btn btn-primary">S'inscrire</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    <main class="container">
+    <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
+                <div class="container messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
             {% endif %}
         {% endwith %}
-
         {% block content %}{% endblock %}
     </main>
 
     <footer class="footer">
         <div class="container">
-            <p class="footer-brand">Hagar-Auth — Sécurisé &amp; Facile</p>
+            <p class="footer-brand">Hagar-Auth</p>
             <ul class="footer-links">
                 <li><a href="{{ url_for('privacy') }}">Confidentialité</a></li>
                 <li><a href="{{ url_for('legal') }}">Mentions légales</a></li>
@@ -52,5 +60,16 @@
             <p class="footer-note">Service opéré par un auteur anonyme</p>
         </div>
     </footer>
+    <script>
+        const burger = document.querySelector('.burger');
+        const nav = document.querySelector('.nav');
+        if (burger) {
+            burger.addEventListener('click', () => {
+                const expanded = burger.getAttribute('aria-expanded') === 'true';
+                burger.setAttribute('aria-expanded', String(!expanded));
+                nav.classList.toggle('open');
+            });
+        }
+    </script>
 </body>
 </html>

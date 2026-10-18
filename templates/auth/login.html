@@ -3,7 +3,13 @@
 {% block content %}
 <div class="auth-wrap">
     <div class="auth-container">
-        <div class="auth-badge">&#128274;</div>
+        {# Icône trait fin : cadenas, aucun emoji #}
+        <div class="icon-box" style="margin: 0 auto 1.1rem;">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="11" width="16" height="9" rx="2"></rect>
+                <path d="M8 11V7a4 4 0 0 1 8 0v4"></path>
+            </svg>
+        </div>
         <h2>Connexion</h2>
         <p class="auth-sub">Accédez à votre espace Hagar-Auth</p>
         <form method="POST">
