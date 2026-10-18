@@ -103,3 +103,31 @@ def test_app_uri_rewriting():
     finally:
         if current is not None:
             os.environ['DATABASE_URL'] = current
+
+
+def test_is_disconnect_stale_stream():
+    from turso_serverless import OperationalError
+
+    dialect = TursoDialect()
+    stale = OperationalError('HTTP status 404: stream not found: 900501ec:e5d0275')
+    assert dialect.is_disconnect(stale, None, None) is True
+
+    bad_baton = OperationalError(
+        'HTTP status 400: Protocol error: unexpected baton format: "deadbeef:deadbee"'
+    )
+    assert dialect.is_disconnect(bad_baton, None, None) is True
+
+    transport = OperationalError(
+        'request to https://example.com/v3/cursor failed: timed out'
+    )
+    assert dialect.is_disconnect(transport, None, None) is True
+
+    sql_error = OperationalError('no such table: users')
+    assert dialect.is_disconnect(sql_error, None, None) is False
+
+
+def test_app_enables_pool_pre_ping():
+    from app import app as flask_app
+
+    options = flask_app.config['SQLALCHEMY_ENGINE_OPTIONS']
+    assert options.get('pool_pre_ping') is True

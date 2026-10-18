@@ -53,6 +53,32 @@ class TursoDialect(SQLiteDialect_pysqlite):
                 self._version = (3, 45, 0)
         return connect
 
+    def is_disconnect(self, e, connection, cursor):
+        """Indique si ``e`` correspond à une connexion Turso à jeter.
+
+        Pendant l'inactivité d'une instance serveless, le stream (baton)
+        expire côté Turso : la première requête suivant l'idle échoue en
+        « HTTP status 404: stream not found ». Avec ``pool_pre_ping``,
+        SQLAlchemy exécute un ``SELECT 1`` à chaque reprise d'une connexion
+        du pool et appelle cette méthode si celui-ci échoue ; ``True`` fait
+        remplacer la connexion périmée par une connexion neuve avant même
+        que l'application n'exécute sa requête.
+        """
+        msg = str(e).lower()
+        if 'stream not found' in msg:
+            return True
+        # 400 « Protocol error: unexpected baton format » et consorts :
+        # l'état du stream n'est plus valide côté serveur.
+        if 'protocol error' in msg:
+            return True
+        # Échec transport HTTP (URLError, reset réseau) : le driver a déjà
+        # réinitialisé le baton, la connexion doit être refaite.
+        if 'request to' in msg and 'failed' in msg:
+            return True
+        if getattr(self, 'dbapi', None) is None:
+            return False
+        return super().is_disconnect(e, connection, cursor)
+
     def create_connect_args(self, url):
         database = url.database or ''
         if database.startswith('turso://'):

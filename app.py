@@ -84,6 +84,7 @@ app.config['REMEMBER_COOKIE_SECURE'] = SESSION_COOKIE_SECURE
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
 app.config['SQLALCHEMY_DATABASE_URI'] = _database_uri()
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_pre_ping': True}
 app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024  # 1 Mo par requête
 
 # --- Limites de débit (Flask-Limiter) ---

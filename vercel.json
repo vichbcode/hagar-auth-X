@@ -1,7 +1,3 @@
 {
-    "regions": ["cdg1"],
-    "rewrites": [
-        { "source": "/", "destination": "/api/index/" },
-        { "source": "/:path*", "destination": "/api/index/:path*" }
-    ]
+    "regions": ["cdg1"]
 }
