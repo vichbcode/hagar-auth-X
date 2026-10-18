@@ -1,160 +1,165 @@
 # Hagar-Auth
 
-Service d'authentification externalisée : créez des projets avec des champs
-personnalisés, générez des fichiers d'inscription/connexion pour vos clients,
-et communiquez via une API REST sécurisée par jeton.
+Service d'authentification **clé en main** : vous créez un projet (« Hagar »),
+vous définissez les champs de votre choix, et l'app génère des formulaires
+d'inscription/connexion prêts à intégrer sur n'importe quel site. Les comptes
+de vos utilisateurs sont stockés de façon sécurisée, et vous consultez la liste
+des inscrits depuis votre tableau de bord.
 
-## Stack
+Vous n'avez pas à écrire de backend : vous déposez les fichiers générés et
+l'authentification fonctionne.
 
-- Python 3.13 · Flask 3 · SQLAlchemy · Waitress
-- Base de données : **Turso Cloud** (libSQL, transport HTTP) ou SQLite local
-- Argon2id pour les mots de passe (repli vérification sur hashes Werkzeug legacy)
-- CSRF (Flask-WTF) · CORS restreint · Rate limiting (Flask-Limiter) · En-têtes (Talisman)
+---
 
-## Installation
+## Comment ça marche
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-Copy-Item .env.example .env   # puis éditer SECRET_KEY
+```
+Votre site (fichiers générés)          Hagar-Auth                Tableau de bord
+┌───────────────────────┐        ┌────────────────────┐        ┌──────────────────┐
+│ inscription.html      │  POST  │  /api/hagar/       │  crée  │  liste des       │
+│ connexion.html        │ ─────► │    register/login  │ ─────► │  utilisateurs    │
+│ (jeton X-Hagar-Token) │        │  (stockage sécurisé)│        │  du projet       │
+└───────────────────────┘        └────────────────────┘        └──────────────────┘
 ```
 
-Générer une clé secrète :
+Chaque projet possède sa **propre clé API** (jeton) et sa **propre structure de
+champs**. Les fichiers générés embarquent ce jeton : ils enregistrent et
+connectent uniquement les utilisateurs de ce projet.
 
-```powershell
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-```
+---
 
-## Configuration (`.env`)
+## Utilisation pas à pas
 
-| Variable | Défaut | Rôle |
-|---|---|---|
-| `SECRET_KEY` | — (obligatoire) | Signature des sessions/CSRF |
-| `DATABASE_URL` | `sqlite:///hagar_auth.db` | `libsql://...` = Turso Cloud ; sinon SQLite |
-| `TURSO_AUTH_TOKEN` | — | Jeton d'accès Turso (obligatoire si URL libsql) |
-| `APP_ENV` | `development` | `production` active HSTS, cookies `Secure`, HTTPS forcé |
-| `FLASK_DEBUG` | — | `1` active le rechargement auto (jamais en prod) |
-| `MAX_CONTENT_LENGTH` | `1048576` (1 Mo) | Taille max des requêtes |
-| `BEHIND_PROXY` | — | `1` si derrière un proxy (active `ProxyFix`, X-Forwarded-For/Proto) |
-| `RATELIMIT_ENABLED` | `1` | `0` désactive temporairement les limites |
+### 1. Créer un compte administrateur
 
-## Base de données Turso (cloud)
+- Allez sur `/register` et choisissez un pseudo et un mot de passe fort
+  (minimum 12 caractères, au moins 3 catégories de caractères).
+- Ensuite, connectez-vous via `/login`.
 
-Le projet est configuré pour **Turso Cloud** via le driver HTTP pur Python
-`turso_serverless` (fonctionne sous Windows, Linux et macOS — contrairement au
-driver natif `libsql-experimental` qui n'a pas de binaire Windows).
+### 2. Créer un Hagar (votre projet)
 
-1. Créer la base : `turso db create hagar-auth-vichbcode`
-2. Générer un jeton : `turso db tokens create hagar-auth-vichbcode`
-3. Coller le jeton dans `.env` → `TURSO_AUTH_TOKEN=...`
-4. Vérifier : `.\.venv\Scripts\python.exe scripts\turso_ping.py`
-5. Démarrer l'application : `init_schema()` crée les tables (et applique les
-   migrations de sécurité) au premier lancement.
+- Cliquez sur **Créer un nouveau Hagar**.
+- Donnez-lui un **nom** (ex. « Boutique Alpha »).
+- Optionnel : un **mot de passe de projet** qui protège l'accès aux données
+  (les fichiers générés, la clé API et la liste des utilisateurs).
+- Définissez la **structure des utilisateurs** : une liste de champs
+  (nom + type). Le **premier champ** sert d'identifiant unique
+  (ex. Email, Pseudo, ID).
+- **Un champ « Mot de passe » est obligatoire** : sans lui, l'inscription est
+  refusée. Il ne peut pas être le premier champ (le premier sert d'identifiant).
 
-Le schéma Turso est compatible SQLite. Pour un retour en local :
-`DATABASE_URL=sqlite:///hagar_auth.db` (ou supprimez la variable).
+Types de champs disponibles : texte, email, mot de passe, nombre, date, heure,
+date et heure, mois, semaine, lien, téléphone, couleur, case à cocher, radio,
+curseur, recherche, champ caché.
 
-## Développement
+### 3. Récupérer la clé API
 
-```powershell
-$env:FLASK_DEBUG = "1"; flask --app app run
-# ou
-.\.venv\Scripts\python.exe app.py
-```
+- Ouvrez le projet : la **clé API** est affichée **une seule fois**, à la
+  création. Copiez-la et conservez-la.
+- Passé cet écran, elle est masquée. Si vous l'avez perdue, cliquez sur
+  **Régénérer la clé API** (attention : l'ancienne cesse immédiatement de
+  fonctionner, vos fichiers intégrés doivent être mis à jour).
+- Si le projet est protégé par mot de passe, vous devrez le saisir pour voir
+  les données et télécharger les fichiers.
 
-Tests :
+### 4. Télécharger les fichiers
 
-```powershell
-.\.venv\Scripts\python.exe -m pytest
-```
+Depuis la fiche du projet, trois fichiers sont téléchargeables :
 
-Au premier démarrage, `init_schema()` crée les tables et applique les
-migrations de sécurité idempotentes : rehash des anciens hashes vers Argon2,
-nettoyage des mots de passe laissés en clair dans les données JSON, remplacement
-du jeton hérité `"no_password"` par un champ sans mot de passe.
+| Fichier | Rôle |
+|---|---|
+| `inscription.html` | Formulaire d'inscription à intégrer sur votre site |
+| `connexion.html` | Formulaire de connexion |
+| `hagar_config.js` | Configuration (jeton + URL de l'API) pour vos intégrations |
 
-## Production
+Les fichiers sont **autonomes** : ouvrez-les dans un navigateur ou hébergez-les
+tels quels. Ils appellent directement l'API et affichent un message de succès
+ou l'erreur exacte (mot de passe trop faible, champ manquant, champ déjà pris…).
 
-```powershell
-$env:APP_ENV = "production"
-waitress-serve --host 127.0.0.1 --port 8000 app:app
-```
+### 5. Intégrer sur votre site
 
-Placer un reverse proxy (nginx, Caddy…) devant avec HTTPS. Si le proxy
-gère le TLS, définir `BEHIND_PROXY=1` pour lire les en-têtes `X-Forwarded-*`.
+- **Le plus simple** : hébergez `inscription.html` / `connexion.html` sur votre
+  site et faites-vous un lien depuis vos pages.
+- **Intégration sur mesure** : repérez la clé API dans `hagar_config.js` et
+  appelez vous-même les routes décrites ci-dessous.
 
-Dans `APP_ENV=production` : HSTS activé, cookies de session `Secure`,
-redirection HTTP→HTTPS, `SESSION_COOKIE_SECURE` et `FORCE_HTTPS` suivent
-l'environnement.
+### 6. Consulter vos utilisateurs
 
-## API (fournisseurs / clients finaux)
+- Ouvrez le projet → **Voir les utilisateurs**.
+- La table affiche chaque inscrit, ses données (les mots de passe ne sont
+  jamais affichés) et la date d'inscription. C'est là que vous voyez
+  immédiatement que quelqu'un s'est inscrit.
 
-Toutes les routes `/api/*`. Authentification par **en-tête** `X-Hagar-Token`
-(ancien format d'URL `/api/hagar/<token>/...` supprimé, renvoie du JSON 404).
+### 7. Gérer / supprimer
 
-### Inscription
+- **Régénérer la clé API** : révoque l'ancienne clé.
+- **Supprimer le Hagar** : supprime le projet et tous ses utilisateurs
+  (irréversible, confirmation demandée).
+
+---
+
+## API pour vos intégrations
+
+Toutes les routes sont sous `/api/*` et authentifiées par l'en-tête
+`X-Hagar-Token: <clé API du projet>`.
+
+### Inscription — `POST /api/hagar/register`
+
+Les clés du formulaire sont les **libellés de champ du projet**.
 
 ```
 POST /api/hagar/register
-X-Hagar-Token: <jeton>
-Content-Type: application/x-www-form-urlencoded
+X-Hagar-Token: <clé API>
 
-Email=client@exemple.fr&Mot de passe=azerty12
+Pseudo=client&Mot de passe=azerty12
 ```
 
-Les clés du formulaire sont les **libellés de champs du projet** (le champ
-« Mot de passe » est obligatoire à la création d'un projet). Réponses :
-`201` créé · `400` validation (mdp faible, champ requis manquant, identifiant
-existant) · `401` jeton invalide · `404` ancienne URL token · `413` corps > 2 Mo
-· `429` rate limit — tous en JSON `{"error": "..."}`.
+Réponses : `201` créé · `400` validation (mot de passe faible, champ requis
+manquant, identifiant déjà pris) · `401` jeton invalide · `429` trop de requêtes.
+Toujours en JSON `{"error": "..."}` ou `{"message": "..."}`.
 
-### Connexion
+### Connexion — `POST /api/hagar/login`
 
 ```
 POST /api/hagar/login
-X-Hagar-Token: <jeton>
+X-Hagar-Token: <clé API>
 
-identifier=client@exemple.fr&password=azerty12
+identifier=client&password=azerty12
 ```
 
-`200` avec les données utilisateur (jamais le mot de passe) · `401` identifiants
-invalides, ou compte migré hérité sans mot de passe · `400` champs manquants.
+`identifier` correspond à la valeur du **premier champ** de la structure
+(ex. Pseudo ou Email). Réponses : `200` avec les données utilisateur (jamais le
+mot de passe) · `401` identifiants invalides · `400` champs manquants.
 
-### Limites
+### Limites d'usage
 
-- API : 30 req/min par IP + 60/min par IP+jeton
-- Login admin : 10/min par utilisateur+IP, 30/min par IP
-- Création de compte admin : 5/h · Démarrage de session projet : 10/min
+- API : 30 requêtes/min par IP et 60/min par IP+projet.
+- Connexion administrateur : 10/min par utilisateur+IP.
+- Création de compte administrateur : 5/heure.
 
-Désactivables temporairement avec `RATELIMIT_ENABLED=0` (ne pas laisser actif
-en production).
+---
 
-## Interface d'administration
+## Sécurité
 
-- `/register` — création compte admin (mots de passe forts : min. 12 caractères
-  avec 3 catégories)
-- `/hagar/create` — création de projet (champ « Mot de passe » obligatoire,
-  en deuxième position minimum)
-- Détail projet verrouillé par mot de passe projet : téléchargements des
-  fichiers HTML générés, rotation du jeton API, suppression
-- `/profile` — changement de mot de passe exigeant le mot de passe actuel
-- `/logout` — POST uniquement (anti-CSRF)
+- Mots de passe utilisateurs et administrateurs hachés (**Argon2id**), jamais
+  stockés en clair ni renvoyés par l'API.
+- Protection **CSRF** sur toutes les actions du tableau de bord.
+- **CORS** limité aux routes API publiques.
+- **Rate limiting** contre le bruteforce.
+- En production : **HTTPS forcé**, cookies `Secure`, HSTS.
+- La clé API n'apparaît **pas** dans l'URL (uniquement dans l'en-tête).
 
-## Fichiers générés
+---
 
-Les fichiers HTML de signup/login utilisent l'en-tête `X-Hagar-Token`
-(le jeton n'apparaît plus dans l'URL). L'URL de l'API est déduite du
-`Host` de la requête (pas d'adresse codée en dur).
+## Pages
 
-## Base de données en production
-
-- Turso : le schéma est créé/ migré automatiquement au démarrage par
-  `init_schema()` (tables, colonnes manquantes, nettoyage des mots de passe
-  hérités). Vérification manuelle : `python scripts/turso_ping.py`.
-- SQLite local : même mécanisme, base dans `instance/`.
-- Flask-Migrate est branché (`flask --app app db upgrade`) si vous préférez
-  des migrations explicites.
-- Après déploiement : créez un mot de passe fort pour le compte admin,
-  et recréez tout projet hérité sans champ mot de passe (l'API refuse
-  les projets hérités sans mdp avec un message explicite).
+| Page | Rôle |
+|---|---|
+| `/` | Accueil / présentation |
+| `/register` · `/login` | Compte administrateur |
+| `/dashboard` | Liste de vos projets |
+| `/hagar/create` | Créer un projet |
+| `/hagar/<id>` | Détails, clé API et téléchargements |
+| `/hagar/<id>/users` | Utilisateurs inscrits au projet |
+| `/profile` | Changer votre mot de passe |
+| `/confidentialite` · `/mentions-legales` | Mentions légales |
