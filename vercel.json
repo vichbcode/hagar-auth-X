@@ -1,7 +1,7 @@
 {
     "regions": ["cdg1"],
     "rewrites": [
-        { "source": "/", "destination": "/api/index?__hagar_path=" },
-        { "source": "/:hagar_path*", "destination": "/api/index?__hagar_path=:hagar_path" }
+        { "source": "/", "destination": "/api/index/" },
+        { "source": "/:path*", "destination": "/api/index/:path*" }
     ]
 }

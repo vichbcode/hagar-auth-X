@@ -1,16 +1,16 @@
 """Point d'entrée WSGI pour Vercel (fonctions serverless Python).
 
-Vercel réécrit toutes les routes vers /api/index et le runtime Python reçoit ce
-chemin de destination dans PATH_INFO (le chemin d'origine est perdu). Chaque
-réécriture (voir vercel.json) transmet donc le chemin d'origine via le paramètre
-__hagar_path, que ce middleware restaure dans PATH_INFO avant le routing Flask.
+Vercel réécrit toutes les routes vers /api/index/<chemin original> et le
+runtime Python reçoit ce chemin de destination dans PATH_INFO. Ce middleware
+restaure le chemin original (strip du préfixe /api/index) avant le routing
+Flask. Le paramètre __hagar_path reste supporté en secours.
 """
 from urllib.parse import parse_qs, urlencode
 
 from app import app as _flask_app
 
 _PARAM = '__hagar_path'
-_FUNCTION_PATHS = ('/api/index', '/api/index/')
+_PREFIX = '/api/index'
 
 
 class VercelPathMiddleware:
@@ -27,8 +27,10 @@ class VercelPathMiddleware:
             original = params.pop(_PARAM)[0]
             environ['PATH_INFO'] = '/' + original.strip('/') if original else '/'
             environ['QUERY_STRING'] = urlencode(params, doseq=True)
-        elif path in _FUNCTION_PATHS:
+        elif path == _PREFIX or path == _PREFIX + '/':
             environ['PATH_INFO'] = '/'
+        elif path.startswith(_PREFIX + '/'):
+            environ['PATH_INFO'] = path[len(_PREFIX):]
         return self.flask_app(environ, start_response)
 
 
