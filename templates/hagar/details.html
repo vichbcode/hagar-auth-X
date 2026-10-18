@@ -1,0 +1,177 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+    <div class="dashboard-header" style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a href="{{ url_for('dashboard') }}" style="text-decoration: none; color: #6b7280; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; display: inline-block;">← Retour au Dashboard</a>
+            <h1 style="font-size: 2.2rem; font-weight: 800; color: #111827; margin: 0;">{{ project.name }}</h1>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{{ url_for('hagar_users', project_id=project.id) }}" class="btn-primary" style="padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                <span></span> Voir les Utilisateurs
+            </a>
+        </div>
+    </div>
+
+    <div class="project-details" style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem;">
+        <!-- Card: API & Structure -->
+        <div class="card" style="background: white; padding: 2.5rem; border-radius: 24px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 2rem;">
+                <div style="background: #f5f3ff; p: 10px; border-radius: 12px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 1.2rem;"></span>
+                </div>
+                <h3 style="margin: 0; font-size: 1.25rem; color: #111827;">Clé API & Configuration</h3>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label style="font-size: 0.85rem; font-weight: 700; color: #4b5563; display: block; margin-bottom: 0.8rem;">Clé API Secrète</label>
+                {% if display_token %}
+                    <div style="background: #fffbeb; border: 1px solid #fde68a; color: #92400e; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.85rem; line-height: 1.5;">
+                        <strong style="display: flex; align-items: center; gap: 6px;">Affichage Unique</strong>
+                        Cette clé ne sera affichée que maintenant. Copiez-la précieusement !
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: center; background: #f9fafb; padding: 12px; border-radius: 12px; border: 2px solid #e5e7eb;">
+                        <code id="api-token" style="flex: 1; font-weight: 700; color: var(--primary); word-break: break-all; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;">{{ project.api_token }}</code>
+                        <button onclick="copyToken()" id="copy-btn" class="btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; cursor: pointer; border-radius: 10px; font-weight: 700;">Copier</button>
+                    </div>
+                {% else %}
+                    <div style="display: flex; gap: 12px; align-items: center; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; color: #64748b;">
+                        <span style="font-size: 1.2rem;"></span>
+                        <span style="font-style: italic; font-size: 0.9rem; font-weight: 500;">Identifiant masqué pour votre sécurité.</span>
+                    </div>
+                {% endif %}
+                <form action="{{ url_for('rotate_api_token', project_id=project.id) }}" method="POST" style="margin-top: 1rem;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn-secondary" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; cursor: pointer; border-radius: 10px; font-weight: 700; background: #f9fafb; border: 1px solid #e5e7eb; color: #374151;"
+                            onclick="return confirm('Régénérer la clé API ? L\u2019ancienne clé cessera immédiatement de fonctionner : les fichiers déjà intégrés chez vos clients devront être mis à jour.');">
+                        🔄 Régénérer la clé API
+                    </button>
+                </form>
+            </div>
+
+            <div style="border-top: 1px solid #f3f4f6; padding-top: 2rem;">
+                <h4 style="font-size: 0.95rem; color: #374151; margin-bottom: 1rem;">Champs du formulaire ({{ project.fields|length }})</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
+                    {% for field in project.fields %}
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 4px;">{{ field.label }}</div>
+                            <div style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 600; letter-spacing: 0.025em;">{{ field.field_type }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Downloads -->
+        <div style="display: flex; flex-direction: column; gap: 2rem;">
+            <div class="card" style="background: white; padding: 2.5rem; border-radius: 24px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem;">
+                    <div style="background: #eff6ff; p: 10px; border-radius: 12px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 1.2rem;"></span>
+                    </div>
+                    <h3 style="margin: 0; font-size: 1.25rem; color: #111827;">Intégration</h3>
+                </div>
+                <p style="margin-bottom: 2rem; color: #6b7280; font-size: 0.95rem; line-height: 1.5;">Téléchargez les fichiers HTML prêts à l'emploi pour votre site web.</p>
+                
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <a href="{{ url_for('download_file', project_id=project.id, type='signup') }}" class="download-link" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; text-decoration: none; color: #374151; font-weight: 600; transition: all 0.2s;">
+                        <span>📥 Inscription.html</span>
+                        <span style="font-size: 1.2rem;">→</span>
+                    </a>
+                    <a href="{{ url_for('download_file', project_id=project.id, type='login') }}" class="download-link" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; text-decoration: none; color: #374151; font-weight: 600; transition: all 0.2s;">
+                        <span>📥 Connexion.html</span>
+                        <span style="font-size: 1.2rem;">→</span>
+                    </a>
+                    <a href="{{ url_for('download_file', project_id=project.id, type='config') }}" class="download-link" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; background: #111827; border: 1px solid #111827; border-radius: 12px; text-decoration: none; color: white; font-weight: 600; transition: all 0.2s;">
+                        <span>📄 hagar_config.js</span>
+                        <span style="opacity: 0.6;">Special</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div style="padding: 1.5rem; background: #fef2f2; border: 1px solid #fee2e2; border-radius: 20px;">
+                <h4 style="color: #991b1b; margin: 0 0 0.5rem 0; font-size: 0.95rem;">Zone Critique</h4>
+                <p style="color: #b91c1c; font-size: 0.8rem; margin-bottom: 1.2rem;">La suppression est irréversible et efface tous les utilisateurs.</p>
+                <button onclick="openModal()" style="width: 100%; background: #ef4444; color: white; border: none; padding: 0.7rem; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.85rem;">Supprimer le Hagar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Fenêtre Modale de Confirmation -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div style="background: #fef2f2; width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+            <span style="font-size: 2rem;"></span>
+        </div>
+        <h3 style="margin: 0 0 1rem 0; font-size: 1.5rem; color: #111827;">Confirmer ?</h3>
+        <p style="color: #6b7280; margin-bottom: 2rem; font-size: 0.95rem; line-height: 1.5;">Êtes-vous sûr de vouloir supprimer <strong>"{{ project.name }}"</strong> ?<br>Tous les utilisateurs seront perdus.</p>
+        
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button onclick="closeModal()" style="flex: 1; padding: 0.8rem; border: 1px solid #e5e7eb; background: white; border-radius: 12px; cursor: pointer; font-weight: 700; color: #4b5563;">Annuler</button>
+            <form action="{{ url_for('delete_hagar', project_id=project.id) }}" method="POST" style="flex: 1;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" style="width: 100%; background: #ef4444; color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 700; cursor: pointer;">Supprimer</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToken() {
+    const token = document.getElementById('api-token').innerText;
+    navigator.clipboard.writeText(token).then(() => {
+        const btn = document.getElementById('copy-btn');
+        const oldText = btn.innerText;
+        btn.innerText = 'Copié !';
+        btn.style.background = '#10b981';
+        btn.style.color = 'white';
+        btn.style.borderColor = '#10b981';
+        setTimeout(() => {
+            btn.innerText = oldText;
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
+        }, 2000);
+    });
+}
+function openModal() { document.getElementById('deleteModal').style.display = 'flex'; }
+function closeModal() { document.getElementById('deleteModal').style.display = 'none'; }
+window.onclick = function(event) {
+    let modal = document.getElementById('deleteModal');
+    if (event.target == modal) closeModal();
+}
+</script>
+
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+.modal-content {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.download-link:hover {
+    background: #f3f4f6 !important;
+    transform: translateX(5px);
+    border-color: var(--primary) !important;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="hero" style="text-align: center; padding: 4rem 0;">
+    <h1 style="font-size: 3rem; margin-bottom: 1rem;">L'authentification facile pour les développeurs.</h1>
+    <p style="font-size: 1.25rem; color: var(--text-muted); max-width: 700px; margin: 0 auto 2rem;">
+        Créez des "Hagars" pour vos projets en quelques secondes. Définissez vos champs, générez vos formulaires et gérez vos utilisateurs en toute sécurité.
+    </p>
+    <a href="{{ url_for('register') }}" class="btn-primary btn-full" style="padding: 1rem 2rem; display: inline-block; width: auto;">Commencer gratuitement</a>
+</div>
+
+<div class="features" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem;">
+    <div class="feature-card" style="background: white; padding: 2rem; border-radius: 1rem; border: 1px solid var(--border);">
+        <h3 style="margin-bottom: 1rem; color: var(--primary);">Rapide</h3>
+        <p>Générez des fichiers HTML prêts à l'emploi pour l'inscription et la connexion.</p>
+    </div>
+    <div class="feature-card" style="background: white; padding: 2rem; border-radius: 1rem; border: 1px solid var(--border);">
+        <h3 style="margin-bottom: 1rem; color: var(--primary);">Flexible</h3>
+        <p>Choisissez les champs dont vous avez besoin : texte, nombres, dates, et plus encore.</p>
+    </div>
+    <div class="feature-card" style="background: white; padding: 2rem; border-radius: 1rem; border: 1px solid var(--border);">
+        <h3 style="margin-bottom: 1rem; color: var(--primary);">Sécurisé</h3>
+        <p>Toutes les données et les mots de passe sont hashés et protégés par nos soins.</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<article class="legal-page">
+    <h1>Politique de confidentialité</h1>
+    <p class="legal-updated">Dernière mise à jour : octobre 2026</p>
+
+    <section>
+        <h2>1. Responsable du traitement</h2>
+        <p>
+            Hagar-Auth est opéré par un <strong>auteur anonyme</strong>. Aucune identité
+            personnelle n'est publiée pour ce service. Vous pouvez nous contacter pour
+            toute question relative à vos données à l'adresse :
+            <a href="mailto:zogixa@protonmail.com">zogixa@protonmail.com</a>.
+        </p>
+    </section>
+
+    <section>
+        <h2>2. Données collectées</h2>
+        <p>Selon votre usage du service, les données suivantes peuvent être traitées :</p>
+        <ul>
+            <li><strong>Comptes administrateurs</strong> : pseudo et empreinte de mot de passe
+                (hachage Argon2id — le mot de passe en clair n'est jamais stocké).</li>
+            <li><strong>Projets</strong> : nom, libellés et types de champs, jeton d'accès API.</li>
+            <li><strong>Comptes créés via l'API</strong> : les valeurs des champs renseignés par
+                les utilisateurs finaux des projets, y compris les mots de passe qui sont
+                hachés immédiatement côté serveur.</li>
+            <li><strong>Données techniques</strong> : adresse IP utilisée temporairement pour la
+                limitation de débit et la protection anti-abus.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>3. Finalités et base légale</h2>
+        <p>
+            Les données sont traitées exclusivement pour le fonctionnement du service :
+            gestion des comptes, authentification, création et administration des projets,
+            et réponse aux requêtes de l'API. Le traitement repose sur l'exécution du
+            service demandé et, pour la limitation de débit, sur l'intérêt légitime de
+            sécuriser le service.
+        </p>
+    </section>
+
+    <section>
+        <h2>4. Cookies</h2>
+        <p>
+            Hagar-Auth utilise uniquement un <strong>cookie de session technique</strong>
+            strictement nécessaire à l'authentification (flags <em>HttpOnly</em>,
+            <em>SameSite</em> et <em>Secure</em> en production). Aucun cookie publicitaire,
+            de traceur ou d'analyse n'est déposé.
+        </p>
+    </section>
+
+    <section>
+        <h2>5. Conservation</h2>
+        <p>
+            Les données sont conservées jusqu'à leur suppression. Vous pouvez supprimer
+            votre compte et vos projets depuis votre espace, ce qui efface les données
+            associées de la base active. Des sauvegardes techniques peuvent subsister
+            pendant une durée limitée nécessaire à la continuité du service.
+        </p>
+    </section>
+
+    <section>
+        <h2>6. Sécurité</h2>
+        <p>
+            Les mots de passe sont stockés sous forme d'hachages Argon2id. Les jetons
+            d'accès API sont aléatoires et révocables. L'application applique la
+            protection CSRF, la limitation de débit, des en-têtes de sécurité stricts
+            et n'expose aucun secret dans ses pages générées.
+        </p>
+    </section>
+
+    <section>
+        <h2>7. Vos droits (RGPD)</h2>
+        <p>
+            Conformément au règlement (UE) 2016/679, vous disposez d'un droit d'accès,
+            de rectification, d'effacement, de limitation et d'opposition sur vos
+            données. Pour exercer ces droits, contactez
+            <a href="mailto:zogixa@protonmail.com">zogixa@protonmail.com</a>.
+            Vous disposez également du droit d'introduire une réclamation auprès de
+            la CNIL.
+        </p>
+    </section>
+
+    <section>
+        <h2>8. Transferts</h2>
+        <p>
+            Les données sont traitées sur les serveurs où le service est hébergé.
+            Aucun transfert vers des tiers à des fins commerciales n'a lieu : les
+            données ne sont ni vendues, ni louées, ni exploitées à des fins publicitaires.
+        </p>
+    </section>
+</article>
+{% endblock %}

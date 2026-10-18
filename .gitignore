@@ -1,0 +1,19 @@
+# Environnement
+.env
+.venv/
+venv/
+
+# Base de données locale (ne jamais versionner)
+instance/*.db
+instance/*.sqlite*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Divers
+*.log
+.DS_Store
+Thumbs.db

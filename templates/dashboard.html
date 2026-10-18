@@ -1,0 +1,121 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 3rem; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #111827; margin: 0;">Mes Hagars</h1>
+        <p style="color: #6b7280; margin-top: 0.5rem;">Gérez vos projets d'authentification personnalisés.</p>
+    </div>
+    <a href="{{ url_for('create_hagar') }}" class="btn-primary" style="padding: 0.8rem 1.5rem; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);">
+        + Créer un Hagar
+    </a>
+</div>
+
+{% if projects %}
+    <div class="project-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem;">
+        {% for project in projects %}
+            {# Un projet est considéré comme verrouillé s'il a un mot de passe #}
+            {% set is_locked = project.password_hash is not none %}
+            <div class="project-card-wrapper" style="position: relative;">
+                <a href="{{ url_for('hagar_details', project_id=project.id) }}" 
+                   class="project-card" 
+                   {% if is_locked %} onclick="event.preventDefault(); openUnlockModal('{{ project.id }}', '{{ project.name }}')" {% endif %}
+                   style="display: block; background: white; padding: 2rem; border-radius: 20px; text-decoration: none; color: inherit; border: 1px solid #e5e7eb; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;">
+                    
+                    {% if is_locked %}
+                    <div style="position: absolute; top: 1.5rem; right: 1.5rem; background: #fff1f2; color: #e11d48; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                        <span> Verrouillé</span>
+                    </div>
+                    {% else %}
+                    <div style="position: absolute; top: 1.5rem; right: 1.5rem; background: #f0fdf4; color: #16a34a; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                        <span> Public</span>
+                    </div>
+                    {% endif %}
+
+                    <h3 style="font-size: 1.4rem; margin: 0 0 0.5rem 0; color: #111827;">{{ project.name }}</h3>
+                    <p style="color: #6b7280; font-size: 0.95rem;">{{ project.users|length }} utilisateurs inscrits</p>
+                    
+                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #f3f4f6; display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-size: 0.8rem; color: #9ca3af;">Créé le {{ project.created_at.strftime('%d/%m/%Y') }}</span>
+                        <span style="color: var(--primary); font-weight: 600; font-size: 0.9rem;">Gérer →</span>
+                    </div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 5rem 2rem; background: white; border-radius: 24px; border: 2px dashed #e5e7eb;">
+        <div style="font-size: 4rem; margin-bottom: 1.5rem;">📁</div>
+        <h3 style="color: #111827; font-size: 1.5rem; margin-bottom: 0.5rem;">Aucun Hagar trouvé</h3>
+        <p style="color: #6b7280; max-width: 400px; margin: 0 auto 2rem;">Commencez par créer votre premier projet d'authentification pour voir vos statistiques ici.</p>
+        <a href="{{ url_for('create_hagar') }}" class="btn-primary" style="padding: 0.8rem 2rem; border-radius: 12px;">Créer mon premier Hagar</a>
+    </div>
+{% endif %}
+
+<!-- Modal de déverrouillage -->
+<div id="unlockModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 1.5rem;">
+    <div style="background: white; width: 100%; max-width: 400px; border-radius: 24px; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); position: relative; animation: modalIn 0.3s ease-out;">
+        <button onclick="closeUnlockModal()" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9ca3af;">&times;</button>
+        
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="background: #f5f3ff; width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                <span style="font-size: 1.8rem;">🛡️</span>
+            </div>
+            <h3 id="modalProjectName" style="font-size: 1.5rem; color: #111827; margin: 0 0 0.5rem 0;">Déverrouiller</h3>
+            <p style="color: #6b7280; font-size: 0.9rem;">Ce Hagar est protégé par un mot de passe.</p>
+        </div>
+
+        <form id="unlockForm" method="POST" action="">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">Mot de passe du projet</label>
+                <input type="password" name="project_password" required placeholder="••••••••" 
+                       style="width: 100%; padding: 0.8rem 1rem; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 1.1rem; outline: none; transition: border-color 0.2s;">
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem; border-radius: 12px; font-weight: 700;">
+                Déverrouiller l'accès
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openUnlockModal(projectId, projectName) {
+    const modal = document.getElementById('unlockModal');
+    const form = document.getElementById('unlockForm');
+    const nameSpan = document.getElementById('modalProjectName');
+    
+    nameSpan.innerText = projectName;
+    form.action = `/hagar/${projectId}`;
+    modal.style.display = 'flex';
+    form.querySelector('input[name="project_password"]').focus();
+}
+
+function closeUnlockModal() {
+    document.getElementById('unlockModal').style.display = 'none';
+}
+
+// Fermer au clic à l'extérieur
+window.onclick = function(event) {
+    const modal = document.getElementById('unlockModal');
+    if (event.target == modal) {
+        closeUnlockModal();
+    }
+}
+</script>
+
+<style>
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1);
+    border-color: var(--primary);
+}
+#unlockForm input:focus {
+    border-color: var(--primary);
+}
+</style>
+{% endblock %}

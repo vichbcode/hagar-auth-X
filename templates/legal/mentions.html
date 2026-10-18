@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<article class="legal-page">
+    <h1>Mentions légales</h1>
+    <p class="legal-updated">Dernière mise à jour : octobre 2026</p>
+
+    <section>
+        <h2>1. Éditeur du site</h2>
+        <p>
+            Le service <strong>Hagar-Auth</strong> est édité par un
+            <strong>auteur anonyme</strong> qui souhaite préserver son anonymat.
+            Aucune identité personnelle ni raison sociale n'est associée à
+            l'édition de ce service.
+        </p>
+        <p>
+            Contact :
+            <a href="mailto:zogixa@protonmail.com">zogixa@protonmail.com</a>
+        </p>
+    </section>
+
+    <section>
+        <h2>2. Hébergement</h2>
+        <p>
+            Le service est auto-hébergé. Pour toute question concernant
+            l'infrastructure technique, le contact reste l'adresse indiquée
+            ci-dessus.
+        </p>
+    </section>
+
+    <section>
+        <h2>3. Propriété intellectuelle</h2>
+        <p>
+            Le code, le design et les contenus de Hagar-Auth sont fournis en
+            l'état, sans revendication d'exploitation exclusive ni restriction
+            d'usage au détriment des utilisateurs : le service est proposé
+            librement à ses utilisateurs.
+        </p>
+    </section>
+
+    <section>
+        <h2>4. Responsabilité</h2>
+        <p>
+            Hagar-Auth est un outil d'authentification destiné à ses utilisateurs
+            administrateurs. L'éditeur ne saurait être tenu responsable de l'usage
+            qui est fait du service par ses utilisateurs, ni des sites ou projets
+            qui l'intègrent, ni des dommages indirects résultant de son utilisation.
+            L'utilisateur reste responsable de la sécurité de son propre projet et
+            des données qu'il collecte auprès de ses clients.
+        </p>
+    </section>
+
+    <section>
+        <h2>5. Données personnelles</h2>
+        <p>
+            Le traitement des données personnelles est décrit dans la
+            <a href="{{ url_for('privacy') }}">politique de confidentialité</a>.
+        </p>
+    </section>
+
+    <section>
+        <h2>6. Droit applicable</h2>
+        <p>
+            Les présentes mentions sont soumises au droit français. En cas de
+            litige, les tribunaux compétents seront ceux prévus par la loi
+            applicable, à défaut d'accord amiable.
+        </p>
+    </section>
+</article>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="auth-container" style="background: white; padding: 2.5rem; border-radius: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+        <h2 style="font-size: 1.8rem; font-weight: 800; color: #111827; margin-bottom: 2rem; text-align: center;">⚙️ Paramètres du Profil</h2>
+        
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">Votre Pseudo</label>
+                <input type="text" name="username" value="{{ current_user.username }}" 
+                       style="width: 100%; padding: 0.8rem 1rem; border: 2px solid #f3f4f6; border-radius: 12px; font-size: 1rem; outline: none; transition: border-color 0.2s;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">Mot de passe actuel <span style="color: #dc2626;">(obligatoire)</span></label>
+                <input type="password" name="current_password" required autocomplete="current-password"
+                       style="width: 100%; padding: 0.8rem 1rem; border: 2px solid #f3f4f6; border-radius: 12px; font-size: 1rem; outline: none; transition: border-color 0.2s;">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0.5rem;">
+                <label style="display: block; font-size: 0.85rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">Nouveau Mot de passe (optionnel)</label>
+                <input type="password" name="password" placeholder="Laissez vide pour ne pas changer" minlength="12" autocomplete="new-password"
+                       style="width: 100%; padding: 0.8rem 1rem; border: 2px solid #f3f4f6; border-radius: 12px; font-size: 1rem; outline: none; transition: border-color 0.2s;">
+                <small style="display: block; margin-top: 0.4rem; color: #6b7280; font-size: 0.75rem;">12 caractères minimum, dont 3 parmi : minuscule, majuscule, chiffre, symbole.</small>
+            </div>
+            
+            <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem; border-radius: 12px; font-weight: 700; font-size: 1rem;">
+                Enregistrer les modifications
+            </button>
+        </form>
+
+        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px dashed #fee2e2;">
+            <h3 style="color: #991b1b; font-size: 1.1rem; font-weight: 800; margin-bottom: 1rem;">⚠️ Zone de Danger</h3>
+            <p style="color: #b91c1c; font-size: 0.85rem; margin-bottom: 1.5rem; line-height: 1.5;">
+                La suppression de votre compte est **irréversible**. <br>
+                Tous vos Hagars, leurs configurations et les données de vos utilisateurs seront **définitivement effacés**.
+            </p>
+            
+            <button onclick="openDeleteModal()" style="width: 100%; background: #fef2f2; color: #e11d48; border: 2px solid #fecaca; padding: 0.8rem; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                Supprimer définitivement mon compte
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression de compte -->
+<div id="deleteAccountModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 1.5rem;">
+    <div style="background: white; width: 100%; max-width: 400px; border-radius: 24px; padding: 2.5rem; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+        <div style="background: #fef2f2; width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+            <span style="font-size: 2rem;">🛑</span>
+        </div>
+        <h3 style="font-size: 1.5rem; color: #111827; margin: 0 0 1rem 0;">Adieu ?</h3>
+        <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.5; margin-bottom: 2rem;">
+            Êtes-vous vraiment sûr ? Cette action supprimera **TOUT** instantanément. On ne pourra rien récupérer.
+        </p>
+        
+        <div style="display: flex; gap: 12px;">
+            <button onclick="closeDeleteModal()" style="flex: 1; padding: 0.8rem; border: 1px solid #e5e7eb; background: white; border-radius: 12px; font-weight: 700; color: #4b5563; cursor: pointer;">Annuler</button>
+            <form action="{{ url_for('delete_account') }}" method="POST" style="flex: 1;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" style="width: 100%; background: #e11d48; color: white; border: none; padding: 0.8rem; border-radius: 12px; font-weight: 700; cursor: pointer;">Tout supprimer</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function openDeleteModal() { document.getElementById('deleteAccountModal').style.display = 'flex'; }
+function closeDeleteModal() { document.getElementById('deleteAccountModal').style.display = 'none'; }
+window.onclick = function(event) {
+    let modal = document.getElementById('deleteAccountModal');
+    if (event.target == modal) closeDeleteModal();
+}
+</script>
+
+<style>
+@keyframes modalIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+input:focus { border-color: var(--primary) !important; }
+</style>
+{% endblock %}

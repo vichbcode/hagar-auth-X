@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="auth-wrap">
+    <div class="auth-container">
+        <div class="auth-badge">&#9997;&#65039;</div>
+        <h2>Inscription</h2>
+        <p class="auth-sub">Créez votre compte administrateur</p>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="username">Pseudo</label>
+                <input type="text" id="username" name="username" required autofocus autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required minlength="12" autocomplete="new-password">
+                <small class="form-hint">12 caractères minimum, dont 3 parmi : minuscule, majuscule, chiffre, symbole.</small>
+            </div>
+            <button type="submit" class="btn-primary btn-full">S'inscrire</button>
+        </form>
+        <p class="auth-alt">
+            Déjà un compte ? <a href="{{ url_for('login') }}">Se connecter</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

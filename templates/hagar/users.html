@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+    <div class="dashboard-header" style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a href="{{ url_for('hagar_details', project_id=project.id) }}" style="text-decoration: none; color: #6b7280; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; display: inline-block;">← Retour aux Détails</a>
+            <h1 style="font-size: 2.2rem; font-weight: 800; color: #111827; margin: 0;">Utilisateurs de {{ project.name }}</h1>
+        </div>
+        <div style="background: white; padding: 0.8rem 1.5rem; border-radius: 12px; border: 1px solid #e5e7eb; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            <span style="background: #eef2ff; color: #4f46e5; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.9rem;">{{ users|length }}</span>
+            <span style="color: #4b5563; font-weight: 600; font-size: 0.9rem;">Inscrits au total</span>
+        </div>
+    </div>
+
+    <div class="card" style="background: white; border-radius: 24px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden;">
+        <div class="table-container" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
+                        {% for field in fields %}
+                            <th style="padding: 1.2rem 1.5rem; font-size: 0.85rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em;">{{ field.label }}</th>
+                        {% endfor %}
+                        <th style="padding: 1.2rem 1.5rem; font-size: 0.85rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.05em;">Date d'inscription</th>
+                    </tr>
+                </thead>
+                <tbody style="color: #1e293b; font-size: 0.95rem;">
+                    {% for user in users %}
+                        {% set user_data = user.get_data() %}
+                        <tr style="border-bottom: 1px solid #f3f4f6; transition: background 0.2s;">
+                            {% for field in fields %}
+                                <td style="padding: 1.2rem 1.5rem;">
+                                    {% if field.field_type == 'color' %}
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div style="width: 20px; height: 20px; border-radius: 4px; background: {{ user_data.get(field.label, '#eee') }}; border: 1px solid #ddd;"></div>
+                                            <code>{{ user_data.get(field.label, '-') }}</code>
+                                        </div>
+                                    {% elif field.field_type == 'password' %}
+                                        <span style="color: #9ca3af; font-family: monospace;">••••••••</span>
+                                    {% else %}
+                                        {{ user_data.get(field.label, '-') }}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                            <td style="padding: 1.2rem 1.5rem; color: #64748b;">{{ user.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                        </tr>
+                    {% endfor %}
+                    
+                    {% if not users %}
+                        <tr>
+                            <td colspan="{{ fields|length + 1 }}" style="padding: 5rem 2rem; text-align: center;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                                <h3 style="color: #111827; margin: 0;">Aucun utilisateur</h3>
+                                <p style="color: #6b7280; margin-top: 0.5rem;">Partagez vos formulaires pour voir les données s'afficher ici.</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+tbody tr:hover { background: #f8fafc; }
+</style>
+{% endblock %}

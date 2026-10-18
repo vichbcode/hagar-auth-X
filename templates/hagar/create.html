@@ -1,0 +1,144 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="auth-container" style="max-width: 800px; background: #fff; padding: 2.5rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+        <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">🛠️ Créer un Nouveau Hagar</h2>
+        <p style="color: var(--text-muted);">Configurez votre projet et définissez les champs dont vous avez besoin.</p>
+    </div>
+
+    <form method="POST" id="hagar-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+            <div class="form-group">
+                <label style="font-weight: 700; color: #374151;">Nom du Hagar</label>
+                <input type="text" name="name" required placeholder="Ex: Boutique Alpha" style="padding: 0.8rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 1rem;">
+            </div>
+            <div class="form-group">
+                <label style="font-weight: 700; color: #374151;">Mot de passe du Hagar (optionnel)</label>
+                <input type="password" name="password" placeholder="Protéger l'accès aux données" style="padding: 0.8rem; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 1rem;">
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid #f3f4f6; padding-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.25rem; color: #111827;">📋 Structure des Utilisateurs</h3>
+                <button type="button" class="btn-add-field" onclick="addField()" style="background: #f3f4f6; color: var(--primary); border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    + Ajouter un champ
+                </button>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: #6b7280; background: #eff6ff; padding: 0.8rem; border-radius: 8px; border-left: 4px solid #3b82f6; margin-bottom: 2rem;">
+                💡 <strong>Conseil :</strong> Le premier champ de la liste servira d'identifiant unique (ex: Email, Pseudo, ID).
+            </p>
+            
+            <div id="fields-container">
+                <div class="field-row card" style="padding: 1.5rem; border: 1px solid #e5e7eb; margin-bottom: 1.2rem; position: relative; background: #fafafa; border-radius: 15px; transition: all 0.3s;">
+                    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; width: 100%;">
+                        <div>
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 8px; display: block;">Nom du champ (Label)</label>
+                            <input type="text" name="field_label[]" placeholder="Ex: Email" required style="width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.7rem;">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 8px; display: block;">Type de donnée</label>
+                            <select name="field_type[]" style="width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.7rem; background: white; cursor: pointer;">
+                                <option value="text">Texte classique</option>
+                                <option value="password">Mot de passe</option>
+                                <option value="email">Email</option>
+                                <option value="number">Nombre</option>
+                                <option value="date">Date</option>
+                                <option value="time">Heure</option>
+                                <option value="url">Lien / URL</option>
+                                <option value="tel">Téléphone</option>
+                                <option value="color">Couleur</option>
+                                <option value="checkbox">Case à cocher</option>
+                                <option value="range">Curseur (Range)</option>
+                                <option value="datetime-local">Date et Heure</option>
+                                <option value="month">Mois</option>
+                                <option value="week">Semaine</option>
+                                <option value="search">Recherche</option>
+                                <option value="file">Fichier</option>
+                                <option value="hidden">Champ Caché</option>
+                                <option value="image">Image (Bouton)</option>
+                                <option value="radio">Bouton Radio</option>
+                                <option value="button">Bouton Simple</option>
+                                <option value="reset">Réinitialiser</option>
+                                <option value="submit">Soumettre</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 3rem; text-align: center;">
+            <button type="submit" class="btn-primary" style="width: 100%; max-width: 400px; padding: 1.2rem; font-size: 1.1rem; border-radius: 12px; font-weight: 700; letter-spacing: 0.5px;">
+                🚀 Lancer mon Hagar
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function addField() {
+    const container = document.getElementById('fields-container');
+    const newRow = document.createElement('div');
+    newRow.className = 'field-row card';
+    newRow.style = 'padding: 1.5rem; border: 1px solid #e5e7eb; margin-bottom: 1.2rem; position: relative; background: #fafafa; border-radius: 15px; animation: popIn 0.3s ease-out;';
+    newRow.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; width: 100%;">
+            <div>
+                <label style="font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 8px; display: block;">Nom du champ (Label)</label>
+                <input type="text" name="field_label[]" placeholder="Nom du champ" required style="width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.7rem;">
+            </div>
+            <div>
+                <label style="font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 8px; display: block;">Type de donnée</label>
+                <select name="field_type[]" style="width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 0.7rem; background: white; cursor: pointer;">
+                    <option value="text">Texte classique</option>
+                    <option value="password">Mot de passe</option>
+                    <option value="email">Email</option>
+                    <option value="number">Nombre</option>
+                    <option value="date">Date</option>
+                    <option value="time">Heure</option>
+                    <option value="url">Lien / URL</option>
+                    <option value="tel">Téléphone</option>
+                    <option value="color">Couleur</option>
+                    <option value="checkbox">Case à cocher</option>
+                    <option value="range">Curseur (Range)</option>
+                    <option value="datetime-local">Date et Heure</option>
+                    <option value="month">Mois</option>
+                    <option value="week">Semaine</option>
+                    <option value="search">Recherche</option>
+                    <option value="file">Fichier</option>
+                    <option value="hidden">Champ Caché</option>
+                    <option value="image">Image (Bouton)</option>
+                    <option value="radio">Bouton Radio</option>
+                    <option value="button">Bouton Simple</option>
+                    <option value="reset">Réinitialiser</option>
+                    <option value="submit">Soumettre</option>
+                </select>
+            </div>
+            <button type="button" onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: -12px; right: -12px; background:#ff4757; color:white; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">&times;</button>
+        </div>
+    `;
+    container.appendChild(newRow);
+}
+</script>
+
+<style>
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+input:focus, select:focus {
+    border-color: var(--primary) !important;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+.field-row:hover {
+    border-color: var(--primary) !important;
+    background: white !important;
+}
+</style>
+{% endblock %}

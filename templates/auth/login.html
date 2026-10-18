@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="auth-wrap">
+    <div class="auth-container">
+        <div class="auth-badge">&#128274;</div>
+        <h2>Connexion</h2>
+        <p class="auth-sub">Accédez à votre espace Hagar-Auth</p>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="username">Pseudo</label>
+                <input type="text" id="username" name="username" required autofocus autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn-primary btn-full">Se connecter</button>
+        </form>
+        <p class="auth-alt">
+            Pas encore de compte ? <a href="{{ url_for('register') }}">S'inscrire</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
