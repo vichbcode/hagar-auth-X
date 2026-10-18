@@ -201,7 +201,7 @@
             msgDiv.innerText = 'Envoi en cours...';
 
             try {
-                const response = await fetch('{{ request.host_url.rstrip("/") }}/api/hagar/register', {
+                const response = await fetch('{{ base_url }}/api/hagar/register', {
                     method: 'POST',
                     headers: { 'X-Hagar-Token': '{{ project.api_token }}' },
                     body: formData

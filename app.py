@@ -156,6 +156,17 @@ def _ip_and_api_token():
     return f'{get_remote_address()}|{token}'
 
 
+def public_base_url():
+    """URL de base canonique gravée dans les fichiers générés.
+
+    En production, PUBLIC_BASE_URL (https://hagar-auth.vercel.app) évite d'enregistrer
+    les URLs de déploiement éphémères Vercel, qui sont ensuite protégées par
+    l'authentification Vercel et cassent les fichiers déjà téléchargés.
+    """
+    configured = os.environ.get('PUBLIC_BASE_URL', '').strip().rstrip('/')
+    return configured or request.host_url.rstrip('/')
+
+
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
@@ -495,13 +506,13 @@ def download_file(project_id, type):
 
     if type == 'signup':
         filename = 'inscription.html'
-        content = render_template('hagar/gen_signup.html', project=project)
+        content = render_template('hagar/gen_signup.html', project=project, base_url=public_base_url())
     elif type == 'login':
         filename = 'connexion.html'
-        content = render_template('hagar/gen_login.html', project=project)
+        content = render_template('hagar/gen_login.html', project=project, base_url=public_base_url())
     elif type == 'config':
         filename = 'hagar_config.js'
-        content = f"const HAGAR_CONFIG = {{\n  api_token: '{project.api_token}',\n  base_url: '{request.host_url.rstrip('/')}'\n}};"
+        content = f"const HAGAR_CONFIG = {{\n  api_token: '{project.api_token}',\n  base_url: '{public_base_url()}'\n}};"
     else:
         abort(400)
 
